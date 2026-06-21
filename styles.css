@@ -588,6 +588,9 @@ ul {
 }
 
 .contact-links a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 14px 16px;
   border: 1px solid rgba(255, 255, 255, 0.11);
   border-radius: 16px;
@@ -596,9 +599,20 @@ ul {
   transition: border-color 0.2s ease, color 0.2s ease;
 }
 
+.contact-links svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+
 .contact-links a:hover {
   border-color: rgba(0, 229, 255, 0.42);
   color: var(--cyan);
+}
+
+.contact-links .whatsapp-link:hover {
+  border-color: rgba(37, 211, 102, 0.65);
+  color: #25d366;
 }
 
 .footer {

@@ -1,13 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Ismail Ibrahim Ismail portfolio - Mid-Level QA Automation Engineer specializing in ERP systems, Selenium, API Testing, and Performance Testing.">
   <title>Ismail Ibrahim | QA Automation Engineer</title>
+  <script>
+    (function () {
+      var theme = localStorage.getItem("theme") || "dark";
+      document.documentElement.dataset.theme = theme;
+      var lang = localStorage.getItem("lang") || "en";
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -23,23 +32,44 @@
     <nav class="nav">
       <a class="resume-link" href="assets/Ismail_CV.pdf" target="_blank" rel="noreferrer">
         <span class="resume-icon">▣</span>
-        <span>Resume</span>
+        <span data-i18n="nav.resume">Resume</span>
       </a>
 
-      <button class="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
+      <div class="nav-right">
+        <div class="nav-links">
+          <a href="#about" data-i18n="nav.about">About</a>
+          <a href="#education" data-i18n="nav.education">Education</a>
+          <a href="#work" data-i18n="nav.work">Work</a>
+          <a href="#leadership" data-i18n="nav.leadership">Leadership</a>
+          <a href="#skills" data-i18n="nav.skills">Skills</a>
+          <a href="#projects" data-i18n="nav.projects">Projects</a>
+          <a href="#contact" data-i18n="nav.contact">Contact</a>
+        </div>
 
-      <div class="nav-links">
-        <a href="#about">About</a>
-        <a href="#education">Education</a>
-        <a href="#work">Work</a>
-        <a href="#leadership">Leadership</a>
-        <a href="#skills">Skills</a>
-        <a href="#projects">Projects</a>
-        <a href="#contact">Contact</a>
+        <div class="nav-controls">
+          <select id="langSelect" class="lang-select" aria-label="Select language">
+            <option value="en">EN</option>
+            <option value="de">DE</option>
+            <option value="es">ES</option>
+            <option value="it">IT</option>
+            <option value="ar">AR</option>
+          </select>
+          <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle light/dark mode">
+            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+            </svg>
+            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+        </div>
+
+        <button class="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
       </div>
     </nav>
   </header>
@@ -52,14 +82,14 @@
         </div>
 
         <div class="hero-copy reveal">
-          <p class="intro">Hi, I'm</p>
-          <h1><span>Ismail</span> Ibrahim</h1>
-          <p class="role">I'm a <span>QA Automation Engineer</span><b class="cursor">|</b></p>
-          <p class="tagline">Navigating complex ERP workflows, APIs, and automation orbits.</p>
+          <p class="intro" data-i18n="hero.intro">Hi, I'm</p>
+          <h1><span data-i18n="hero.firstName">Ismail</span> <b data-i18n="hero.lastName">Ibrahim</b></h1>
+          <p class="role"><span data-i18n="hero.rolePrefix">I'm a </span><span class="role-accent" data-i18n="hero.role">QA Automation Engineer</span><b class="cursor">|</b></p>
+          <p class="tagline" data-i18n="hero.tagline">Navigating complex ERP workflows, APIs, and automation orbits.</p>
 
           <div class="hero-actions">
-            <a class="btn primary" href="#contact">Contact Me</a>
-            <a class="btn ghost" href="https://raw.githubusercontent.com/ismail0ibrahim/ismail-portfolio/main/assets/Ismail_CV.pdf" download target="_blank" rel="noreferrer">Download CV</a>
+            <a class="btn primary" href="#contact" data-i18n="hero.contactBtn">Contact Me</a>
+            <a class="btn ghost" href="https://raw.githubusercontent.com/ismail0ibrahim/ismail-portfolio/main/assets/Ismail_CV.pdf" download target="_blank" rel="noreferrer" data-i18n="hero.downloadCv">Download CV</a>
           </div>
         </div>
       </div>
@@ -71,17 +101,17 @@
 
     <section class="section" id="about">
       <div class="section-title reveal">
-        <p>Introduction</p>
-        <h2>About Me.</h2>
+        <p data-i18n="about.kicker">Introduction</p>
+        <h2 data-i18n="about.title">About Me.</h2>
       </div>
       <div class="about-grid">
         <article class="about-copy reveal">
-          <p>
+          <p data-i18n="about.p1">
             Mid-Level QA Automation Engineer with 2+ years of experience in ERP and POS system quality assurance.
             I build test strategies, design manual and automation coverage, validate APIs and databases, and help
             teams release stable business-critical software.
           </p>
-          <p>
+          <p data-i18n="about.p2">
             My work covers Selenium Python automation, Postman and Newman API testing, SQL Server and PostgreSQL
             validation, JMeter and Locust performance testing, and full SDLC/STLC collaboration in Agile/Scrum teams.
           </p>
@@ -90,19 +120,19 @@
         <div class="service-grid">
           <article class="service-card reveal">
             <span>01</span>
-            <h3>Manual & Regression QA</h3>
+            <h3 data-i18n="service.1">Manual &amp; Regression QA</h3>
           </article>
           <article class="service-card reveal">
             <span>02</span>
-            <h3>Selenium Python Automation</h3>
+            <h3 data-i18n="service.2">Selenium Python Automation</h3>
           </article>
           <article class="service-card reveal">
             <span>03</span>
-            <h3>API & Database Validation</h3>
+            <h3 data-i18n="service.3">API &amp; Database Validation</h3>
           </article>
           <article class="service-card reveal">
             <span>04</span>
-            <h3>Performance Testing</h3>
+            <h3 data-i18n="service.4">Performance Testing</h3>
           </article>
         </div>
       </div>
@@ -110,42 +140,42 @@
 
     <section class="section" id="education">
       <div class="section-title reveal">
-        <p>Academic Track</p>
-        <h2>Education.</h2>
+        <p data-i18n="edu.kicker">Academic Track</p>
+        <h2 data-i18n="edu.title">Education.</h2>
       </div>
       <div class="timeline">
         <article class="timeline-card reveal">
           <span class="dot"></span>
-          <p class="date">Sep 2018 - Jun 2022</p>
-          <h3>Bachelor of Computer Science</h3>
-          <p>Thebes Academy, Cairo, Egypt | GPA: 3.0 / 4.0</p>
+          <p class="date" data-i18n="edu.date1">Sep 2018 - Jun 2022</p>
+          <h3 data-i18n="edu.degree1">Bachelor of Computer Science</h3>
+          <p data-i18n="edu.school1">Thebes Academy, Cairo, Egypt | GPA: 3.0 / 4.0</p>
         </article>
         <article class="timeline-card reveal">
           <span class="dot"></span>
-          <p class="date">In Progress</p>
-          <h3>ISTQB Foundation Level</h3>
-          <p>Certification track focused on software testing foundations and quality practices.</p>
+          <p class="date" data-i18n="edu.date2">In Progress</p>
+          <h3 data-i18n="edu.degree2">ISTQB Foundation Level</h3>
+          <p data-i18n="edu.desc2">Certification track focused on software testing foundations and quality practices.</p>
         </article>
       </div>
     </section>
 
     <section class="section" id="work">
       <div class="section-title reveal">
-        <p>What I have done so far</p>
-        <h2>Work Experience.</h2>
+        <p data-i18n="work.kicker">What I have done so far</p>
+        <h2 data-i18n="work.title">Work Experience.</h2>
       </div>
       <div class="timeline">
         <article class="timeline-card reveal">
           <span class="dot"></span>
-          <p class="date">May 2024 - Present</p>
-          <h3>QA Automation Engineer - Team Leader</h3>
-          <p class="company">Ultimate Solutions</p>
+          <p class="date" data-i18n="work.date">May 2024 - Present</p>
+          <h3 data-i18n="work.role">QA Automation Engineer - Team Leader</h3>
+          <p class="company" data-i18n="work.company">Ultimate Solutions</p>
           <ul>
-            <li>Led QA for 5+ ERP modules including Finance, HR, Inventory, Accounting, and Purchase.</li>
-            <li>Managed 700+ issues across frontend, backend, API, and business logic layers using GitLab and Jira.</li>
-            <li>Developed 15+ Selenium Python automation scripts for complex ERP purchase invoice workflows.</li>
-            <li>Tested 100+ REST, GRPC, and SOAP endpoints using Postman, Newman, SQL Server, and PostgreSQL.</li>
-            <li>Executed Locust performance testing, SQL Injection validation, and end-to-end workflow verification.</li>
+            <li data-i18n="work.li1">Led QA for 5+ ERP modules including Finance, HR, Inventory, Accounting, and Purchase.</li>
+            <li data-i18n="work.li2">Managed 700+ issues across frontend, backend, API, and business logic layers using GitLab and Jira.</li>
+            <li data-i18n="work.li3">Developed 15+ Selenium Python automation scripts for complex ERP purchase invoice workflows.</li>
+            <li data-i18n="work.li4">Tested 100+ REST, GRPC, and SOAP endpoints using Postman, Newman, SQL Server, and PostgreSQL.</li>
+            <li data-i18n="work.li5">Executed Locust performance testing, SQL Injection validation, and end-to-end workflow verification.</li>
           </ul>
         </article>
       </div>
@@ -153,33 +183,33 @@
 
     <section class="section" id="leadership">
       <div class="section-title reveal">
-        <p>Impact</p>
-        <h2>Leadership.</h2>
+        <p data-i18n="lead.kicker">Impact</p>
+        <h2 data-i18n="lead.title">Leadership.</h2>
       </div>
       <div class="stats-grid">
         <article class="stat-card reveal">
           <strong>70%</strong>
-          <span>Reduced manual regression effort</span>
+          <span data-i18n="stat.1">Reduced manual regression effort</span>
         </article>
         <article class="stat-card reveal">
           <strong>700+</strong>
-          <span>Issues managed across product layers</span>
+          <span data-i18n="stat.2">Issues managed across product layers</span>
         </article>
         <article class="stat-card reveal">
           <strong>100+</strong>
-          <span>API endpoints tested and validated</span>
+          <span data-i18n="stat.3">API endpoints tested and validated</span>
         </article>
         <article class="stat-card reveal">
           <strong>3</strong>
-          <span>Mobile apps tested for functionality and APIs</span>
+          <span data-i18n="stat.4">Mobile apps tested for functionality and APIs</span>
         </article>
       </div>
     </section>
 
     <section class="section" id="skills">
       <div class="section-title reveal">
-        <p>My technical orbit</p>
-        <h2>Skills.</h2>
+        <p data-i18n="skills.kicker">My technical orbit</p>
+        <h2 data-i18n="skills.title">Skills.</h2>
       </div>
       <div class="skills-cloud reveal">
         <span>Manual Testing</span>
@@ -211,30 +241,30 @@
 
     <section class="section" id="projects">
       <div class="section-title reveal">
-        <p>Selected work</p>
-        <h2>Projects.</h2>
+        <p data-i18n="proj.kicker">Selected work</p>
+        <h2 data-i18n="proj.title">Projects.</h2>
       </div>
       <div class="projects-grid">
         <article class="project-card reveal">
           <div class="project-cover">ERP</div>
-          <h3>Skey ERP System Automation</h3>
-          <p>QA coverage for 5+ modules, 700+ defects, 15+ Selenium Python scripts, and 100+ API endpoints.</p>
-          <a href="https://github.com/ismail0ibrahim/automation_skey" target="_blank" rel="noreferrer">View Repository</a>
+          <h3 data-i18n="proj1.title">Skey ERP System Automation</h3>
+          <p data-i18n="proj1.desc">QA coverage for 5+ modules, 700+ defects, 15+ Selenium Python scripts, and 100+ API endpoints.</p>
+          <a href="https://github.com/ismail0ibrahim/automation_skey" target="_blank" rel="noreferrer" data-i18n="proj.link">View Repository</a>
         </article>
         <article class="project-card reveal">
           <div class="project-cover">FERP</div>
-          <h3>FERP ERP System</h3>
-          <p>Regression and integration testing for Finance, HR, and Inventory modules within Agile release cycles.</p>
+          <h3 data-i18n="proj2.title">FERP ERP System</h3>
+          <p data-i18n="proj2.desc">Regression and integration testing for Finance, HR, and Inventory modules within Agile release cycles.</p>
         </article>
         <article class="project-card reveal">
           <div class="project-cover">API</div>
-          <h3>Motkamel ERP System</h3>
-          <p>API, regression, and integration testing for core ERP modules including Finance and HR workflows.</p>
+          <h3 data-i18n="proj3.title">Motkamel ERP System</h3>
+          <p data-i18n="proj3.desc">API, regression, and integration testing for core ERP modules including Finance and HR workflows.</p>
         </article>
         <article class="project-card reveal">
           <div class="project-cover">POS</div>
-          <h3>POS & Mobile Applications</h3>
-          <p>Functional, usability, API integration, and mobile testing for Skey Mobile, Skey POS, and Cashier Me.</p>
+          <h3 data-i18n="proj4.title">POS &amp; Mobile Applications</h3>
+          <p data-i18n="proj4.desc">Functional, usability, API integration, and mobile testing for Skey Mobile, Skey POS, and Cashier Me.</p>
         </article>
       </div>
     </section>
@@ -242,9 +272,9 @@
     <section class="section contact-section" id="contact">
       <div class="contact-panel reveal">
         <div>
-          <p class="mini-title">Get in touch</p>
-          <h2>Contact.</h2>
-          <p>Cairo, Egypt | Arabic Native | English B2 Upper Intermediate</p>
+          <p class="mini-title" data-i18n="contact.kicker">Get in touch</p>
+          <h2 data-i18n="contact.title">Contact.</h2>
+          <p data-i18n="contact.info">Cairo, Egypt | Arabic Native | English B2 Upper Intermediate</p>
         </div>
         <div class="contact-links">
           <a href="mailto:ismailofficialibrahim@gmail.com">ismailofficialibrahim@gmail.com</a>
@@ -252,7 +282,7 @@
             <svg aria-hidden="true" focusable="false" viewBox="0 0 448 512">
               <path fill="currentColor" d="M380.9 97.1c-41.9-42-97.7-65.1-157-65.1-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-156.9zM223.9 438.7c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3 18.6-68.1-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1s56.2 81.2 56.1 130.5c0 101.8-84.9 184.6-186.6 184.6zM325.1 300.5c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8s-14.3 18-17.6 21.8c-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7s-12.5-30.1-17.1-41.2c-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2s-9.7 1.4-14.8 6.9c-5.1 5.6-19.4 19-19.4 46.3s19.9 53.7 22.6 57.4c2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4s4.6-24.1 3.2-26.4c-1.3-2.5-5-3.9-10.5-6.6z"></path>
             </svg>
-            <span>WhatsApp</span>
+            <span data-i18n="contact.whatsapp">WhatsApp</span>
           </a>
           <a href="https://linkedin.com/in/ismailaljahni" target="_blank" rel="noreferrer">LinkedIn</a>
           <a href="https://github.com/ismail0ibrahim" target="_blank" rel="noreferrer">GitHub</a>
@@ -262,9 +292,10 @@
   </main>
 
   <footer class="footer">
-    <p>© <span id="year"></span> Ismail Ibrahim Ismail</p>
+    <p>© <span id="year"></span> <span data-i18n="footer.name">Ismail Ibrahim Ismail</span></p>
   </footer>
 
+  <script src="translations.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

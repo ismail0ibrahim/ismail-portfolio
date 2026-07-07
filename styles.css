@@ -702,6 +702,16 @@ ul {
     linear-gradient(135deg, rgba(0, 229, 255, 0.18), rgba(139, 92, 246, 0.34));
 }
 
+.project-cover-logo {
+  background: #f4f8ff;
+}
+
+.project-cover-logo img {
+  width: 72%;
+  max-height: 74%;
+  object-fit: contain;
+}
+
 .project-card h3 {
   margin-bottom: 12px;
   font-size: 1.25rem;

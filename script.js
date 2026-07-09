@@ -5,7 +5,12 @@ const revealItems = document.querySelectorAll(".reveal");
 const sections = document.querySelectorAll("section[id]");
 const year = document.querySelector("#year");
 const themeToggle = document.querySelector("#themeToggle");
-const langSelect = document.querySelector("#langSelect");
+const langDropdown = document.querySelector("#langDropdown");
+const langToggle = document.querySelector("#langToggle");
+const langToggleFlag = document.querySelector("#langToggleFlag");
+const langToggleLabel = document.querySelector("#langToggleLabel");
+const langMenu = document.querySelector("#langMenu");
+const langOptions = document.querySelectorAll("#langMenu li");
 
 if (year) {
   year.textContent = new Date().getFullYear();
@@ -35,15 +40,48 @@ function applyLanguage(lang) {
   });
 }
 
-const savedLang = localStorage.getItem("lang") || "en";
-if (langSelect) {
-  langSelect.value = savedLang;
-  langSelect.addEventListener("change", () => {
-    localStorage.setItem("lang", langSelect.value);
-    applyLanguage(langSelect.value);
+function updateLangToggle(lang) {
+  const option = document.querySelector(`#langMenu li[data-lang="${lang}"]`);
+  if (!option || !langToggleFlag || !langToggleLabel) {
+    return;
+  }
+  langToggleFlag.src = `https://flagcdn.com/w40/${option.dataset.flag}.png`;
+  langToggleLabel.textContent = lang.toUpperCase();
+  langOptions.forEach((li) => {
+    li.setAttribute("aria-selected", String(li.dataset.lang === lang));
   });
 }
+
+function closeLangMenu() {
+  langDropdown?.classList.remove("open");
+  langToggle?.setAttribute("aria-expanded", "false");
+}
+
+const savedLang = localStorage.getItem("lang") || "en";
+updateLangToggle(savedLang);
 applyLanguage(savedLang);
+
+langToggle?.addEventListener("click", (event) => {
+  event.stopPropagation();
+  const isOpen = langDropdown.classList.toggle("open");
+  langToggle.setAttribute("aria-expanded", String(isOpen));
+});
+
+langOptions.forEach((li) => {
+  li.addEventListener("click", () => {
+    const lang = li.dataset.lang;
+    localStorage.setItem("lang", lang);
+    updateLangToggle(lang);
+    applyLanguage(lang);
+    closeLangMenu();
+  });
+});
+
+document.addEventListener("click", (event) => {
+  if (langDropdown && !langDropdown.contains(event.target)) {
+    closeLangMenu();
+  }
+});
 
 navToggle?.addEventListener("click", () => {
   const isOpen = navLinks?.classList.toggle("open") ?? false;

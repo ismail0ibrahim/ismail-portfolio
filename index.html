@@ -52,13 +52,25 @@
         </div>
 
         <div class="nav-controls">
-          <select id="langSelect" class="lang-select" aria-label="Select language">
-            <option value="en">EN</option>
-            <option value="de">DE</option>
-            <option value="es">ES</option>
-            <option value="it">IT</option>
-            <option value="ar">AR</option>
-          </select>
+          <div class="lang-dropdown" id="langDropdown">
+            <button type="button" class="lang-toggle" id="langToggle" aria-haspopup="listbox" aria-expanded="false" aria-label="Select language">
+              <img class="lang-flag" id="langToggleFlag" src="https://flagcdn.com/w40/gb.png" alt="">
+              <span id="langToggleLabel">EN</span>
+              <svg class="lang-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M6 9l6 6 6-6"></path>
+              </svg>
+            </button>
+            <ul class="lang-menu" id="langMenu" role="listbox" aria-label="Languages">
+              <li role="option" data-lang="en" data-flag="gb"><img class="lang-flag" src="https://flagcdn.com/w40/gb.png" alt=""><span>EN</span></li>
+              <li role="option" data-lang="de" data-flag="de"><img class="lang-flag" src="https://flagcdn.com/w40/de.png" alt=""><span>DE</span></li>
+              <li role="option" data-lang="es" data-flag="es"><img class="lang-flag" src="https://flagcdn.com/w40/es.png" alt=""><span>ES</span></li>
+              <li role="option" data-lang="it" data-flag="it"><img class="lang-flag" src="https://flagcdn.com/w40/it.png" alt=""><span>IT</span></li>
+              <li role="option" data-lang="tr" data-flag="tr"><img class="lang-flag" src="https://flagcdn.com/w40/tr.png" alt=""><span>TR</span></li>
+              <li role="option" data-lang="ru" data-flag="ru"><img class="lang-flag" src="https://flagcdn.com/w40/ru.png" alt=""><span>RU</span></li>
+              <li role="option" data-lang="zh" data-flag="cn"><img class="lang-flag" src="https://flagcdn.com/w40/cn.png" alt=""><span>ZH</span></li>
+              <li role="option" data-lang="ar" data-flag="eg"><img class="lang-flag" src="https://flagcdn.com/w40/eg.png" alt=""><span>AR</span></li>
+            </ul>
+          </div>
           <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle light/dark mode">
             <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
               <circle cx="12" cy="12" r="4"></circle>

@@ -29,8 +29,9 @@ function applyLanguage(lang) {
     }
   });
 
+  const cvFile = `assets/Ismail_CV_${(TRANSLATIONS[lang] ? lang : "en").toUpperCase()}.pdf`;
   document.querySelectorAll(".cv-link").forEach((el) => {
-    el.href = `cv.html?lang=${lang}`;
+    el.href = cvFile;
   });
 }
 

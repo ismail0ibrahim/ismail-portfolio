@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ismail Ibrahim | CV</title>
+  <script>
+    (function () {
+      var params = new URLSearchParams(location.search);
+      var lang = params.get("lang") || localStorage.getItem("lang") || "en";
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --accent: #1f4e8c;
+      --ink: #1c1c1c;
+      --muted: #444;
+      --line: #1f4e8c;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #e8ecf2;
+      font-family: "Poppins", "Cairo", sans-serif;
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    html[lang="ar"] body {
+      font-family: "Cairo", "Poppins", sans-serif;
+    }
+
+    .toolbar {
+      max-width: 850px;
+      margin: 0 auto;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar a,
+    .toolbar button {
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      padding: 10px 18px;
+      border-radius: 999px;
+    }
+
+    .toolbar a {
+      color: var(--accent);
+      background: #fff;
+      border: 1px solid #c6d2e3;
+    }
+
+    .toolbar button {
+      color: #fff;
+      background: var(--accent);
+    }
+
+    .page {
+      max-width: 850px;
+      margin: 0 auto 40px;
+      background: #fff;
+      padding: 48px 56px;
+      box-shadow: 0 10px 30px rgba(20, 40, 80, 0.15);
+    }
+
+    .cv-header {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .cv-header h1 {
+      color: var(--accent);
+      font-size: 1.5rem;
+      letter-spacing: 0.5px;
+    }
+
+    .cv-header .headline {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 2px;
+    }
+
+    .cv-header .contact {
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-top: 6px;
+    }
+
+    .cv-header .contact a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    section {
+      margin-top: 18px;
+    }
+
+    h2 {
+      color: var(--accent);
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      border-bottom: 1.5px solid var(--line);
+      padding-bottom: 4px;
+      margin-bottom: 8px;
+    }
+
+    p, li {
+      font-size: 0.86rem;
+      color: var(--ink);
+    }
+
+    ul {
+      padding-inline-start: 20px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    .skill-line {
+      font-size: 0.86rem;
+      margin-bottom: 4px;
+    }
+
+    .skill-line b {
+      color: var(--ink);
+    }
+
+    .role-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+
+    .role-line h3 {
+      font-size: 0.9rem;
+      color: var(--ink);
+    }
+
+    .role-line .date {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .proj {
+      margin-bottom: 8px;
+    }
+
+    .proj h3 {
+      font-size: 0.88rem;
+      color: var(--ink);
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .toolbar {
+        display: none;
+      }
+
+      .page {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+      }
+
+      @page {
+        margin: 14mm 16mm;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .page {
+        padding: 28px 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <a href="index.html" data-cvi18n="action.back">← Back to Portfolio</a>
+    <button type="button" onclick="window.print()" data-cvi18n="action.print">Download PDF</button>
+  </div>
+
+  <main class="page">
+    <header class="cv-header">
+      <h1 data-cvi18n="cv.name">ISMAIL IBRAHIM ISMAIL</h1>
+      <p class="headline" data-cvi18n="cv.headline">Senior QA Automation Engineer | ERP Systems | Selenium | API Testing | JMeter</p>
+      <p class="contact">
+        +201025907643 | <a href="mailto:ismailofficialibrahim@gmail.com">ismailofficialibrahim@gmail.com</a> |
+        <a href="https://linkedin.com/in/ismailaljahni">linkedin.com/in/ismailaljahni</a> |
+        <a href="https://github.com/ismail0ibrahim">github.com/ismail0ibrahim</a> |
+        <span data-cvi18n="cv.location">Cairo, Egypt</span>
+      </p>
+    </header>
+
+    <section>
+      <h2 data-cvi18n="sec.summary">Professional Summary</h2>
+      <p data-cvi18n="summary.text"></p>
+    </section>
+
+    <section>
+      <h2 data-cvi18n="sec.skills">Technical Skills</h2>
+      <p class="skill-line"><b data-cvi18n="skills.testing.label"></b> <span data-cvi18n="skills.testing.value"></span></p>
+      <p class="skill-line"><b data-cvi18n="skills.api.label"></b> <span data-cvi18n="skills.api.value"></span></p>
+      <p class="skill-line"><b data-cvi18n="skills.automation.label"></b> <span data-cvi18n="skills.automation.value"></span></p>
+      <p class="skill-line"><b data-cvi18n="skills.performance.label"></b> <span data-cvi18n="skills.performance.value"></span></p>
+      <p class="skill-line"><b data-cvi18n="skills.vcs.label"></b> <span data-cvi18n="skills.vcs.value"></span></p>
+      <p class="skill-line"><b data-cvi18n="skills.db.label"></b> <span data-cvi18n="skills.db.value"></span></p>
+      <p class="skill-line"><b data-cvi18n="skills.erp.label"></b> <span data-cvi18n="skills.erp.value"></span></p>
+      <p class="skill-line"><b data-cvi18n="skills.lang.label"></b> <span data-cvi18n="skills.lang.value"></span></p>
+    </section>
+
+    <section>
+      <h2 data-cvi18n="sec.experience">Professional Experience</h2>
+      <div class="role-line">
+        <h3 data-cvi18n="exp.role"></h3>
+        <span class="date" data-cvi18n="exp.date"></span>
+      </div>
+      <ul>
+        <li data-cvi18n="exp.li1"></li>
+        <li data-cvi18n="exp.li2"></li>
+        <li data-cvi18n="exp.li3"></li>
+        <li data-cvi18n="exp.li4"></li>
+        <li data-cvi18n="exp.li5"></li>
+        <li data-cvi18n="exp.li6"></li>
+        <li data-cvi18n="exp.li7"></li>
+        <li data-cvi18n="exp.li8"></li>
+        <li data-cvi18n="exp.li9"></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 data-cvi18n="sec.projects">Key Projects</h2>
+      <div class="proj">
+        <h3 data-cvi18n="proj1.title"></h3>
+        <p data-cvi18n="proj1.desc"></p>
+      </div>
+      <div class="proj">
+        <h3 data-cvi18n="proj2.title"></h3>
+        <p data-cvi18n="proj2.desc"></p>
+      </div>
+      <div class="proj">
+        <h3 data-cvi18n="proj3.title"></h3>
+        <p data-cvi18n="proj3.desc"></p>
+      </div>
+      <div class="proj">
+        <h3 data-cvi18n="proj4.title"></h3>
+        <p data-cvi18n="proj4.desc"></p>
+      </div>
+    </section>
+
+    <section>
+      <h2 data-cvi18n="sec.certs">Certifications &amp; Training</h2>
+      <ul>
+        <li data-cvi18n="cert.1"></li>
+        <li data-cvi18n="cert.2"></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 data-cvi18n="sec.education">Education</h2>
+      <div class="role-line">
+        <h3 data-cvi18n="edu.degree"></h3>
+        <span class="date" data-cvi18n="edu.date"></span>
+      </div>
+    </section>
+
+    <section>
+      <h2 data-cvi18n="sec.languages">Languages</h2>
+      <p data-cvi18n="lang.text"></p>
+    </section>
+  </main>
+
+  <script src="cv-translations.js"></script>
+  <script>
+    (function () {
+      var params = new URLSearchParams(location.search);
+      var lang = params.get("lang") || localStorage.getItem("lang") || "en";
+      var dict = CV_TRANSLATIONS[lang] || CV_TRANSLATIONS.en;
+
+      document.title = dict["meta.title"];
+      document.querySelectorAll("[data-cvi18n]").forEach(function (el) {
+        var key = el.dataset.cvi18n;
+        if (dict[key]) {
+          el.textContent = dict[key];
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

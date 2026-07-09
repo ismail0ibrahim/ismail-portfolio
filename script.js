@@ -28,6 +28,10 @@ function applyLanguage(lang) {
       el.textContent = dict[key];
     }
   });
+
+  document.querySelectorAll(".cv-link").forEach((el) => {
+    el.href = `cv.html?lang=${lang}`;
+  });
 }
 
 const savedLang = localStorage.getItem("lang") || "en";

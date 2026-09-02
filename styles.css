@@ -588,13 +588,24 @@ ul {
 
 .about-copy {
   display: grid;
-  gap: 18px;
+  gap: 22px;
   align-content: center;
-  padding: 28px;
+  padding: 36px 38px;
   border: 1px solid var(--border);
   border-radius: 24px;
   background: var(--panel);
   box-shadow: var(--shadow);
+}
+
+.about-copy p {
+  font-size: clamp(1.02rem, 1.5vw, 1.15rem);
+  line-height: 1.95;
+  text-align: justify;
+  text-wrap: pretty;
+}
+
+html[dir="rtl"] .about-copy p {
+  text-align: right;
 }
 
 .service-grid,
@@ -1030,6 +1041,14 @@ ul {
 @media (max-width: 640px) {
   :root {
     --container: min(100% - 28px, 1180px);
+  }
+
+  .about-copy {
+    padding: 26px 24px;
+  }
+
+  .about-copy p {
+    text-align: start;
   }
 
   .nav {

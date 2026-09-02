@@ -34,9 +34,13 @@ function applyLanguage(lang) {
     }
   });
 
-  const cvFile = `assets/Ismail_CV_${(TRANSLATIONS[lang] ? lang : "en").toUpperCase()}.pdf`;
+  const cvName = `Ismail_CV_${(TRANSLATIONS[lang] ? lang : "en").toUpperCase()}.pdf`;
+  const cvFile = `assets/${cvName}?v=20260902`;
   document.querySelectorAll(".cv-link").forEach((el) => {
     el.href = cvFile;
+    if (el.hasAttribute("download")) {
+      el.setAttribute("download", cvName);
+    }
   });
 }
 

@@ -35,7 +35,7 @@ function applyLanguage(lang) {
   });
 
   const cvName = `Ismail_CV_${(TRANSLATIONS[lang] ? lang : "en").toUpperCase()}.pdf`;
-  const cvFile = `assets/${cvName}?v=20260908`;
+  const cvFile = `assets/${cvName}?v=20261007`;
   document.querySelectorAll(".cv-link").forEach((el) => {
     el.href = cvFile;
     if (el.hasAttribute("download")) {

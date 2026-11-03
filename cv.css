@@ -1,0 +1,185 @@
+:root {
+  --accent: #1f4e8c;
+  --ink: #1c1c1c;
+  --muted: #444;
+  --line: #1f4e8c;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #e8ecf2;
+  font-family: "Poppins", "Cairo", sans-serif;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+html[lang="ar"] body {
+  font-family: "Cairo", "Poppins", sans-serif;
+}
+
+.toolbar {
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.toolbar a,
+.toolbar button {
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px 18px;
+  border-radius: 999px;
+}
+
+.toolbar a {
+  color: var(--accent);
+  background: #fff;
+  border: 1px solid #c6d2e3;
+}
+
+.toolbar button {
+  color: #fff;
+  background: var(--accent);
+}
+
+.page {
+  max-width: 850px;
+  margin: 0 auto 40px;
+  background: #fff;
+  padding: 48px 56px;
+  box-shadow: 0 10px 30px rgba(20, 40, 80, 0.15);
+}
+
+.cv-header {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.cv-header h1 {
+  color: var(--accent);
+  font-size: 1.5rem;
+  letter-spacing: 0.5px;
+}
+
+.cv-header .headline {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-top: 2px;
+}
+
+.cv-header .contact {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin-top: 6px;
+}
+
+.cv-header .contact a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+section {
+  margin-top: 14px;
+}
+
+h2 {
+  color: var(--accent);
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-bottom: 1.5px solid var(--line);
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+}
+
+p, li {
+  font-size: 0.86rem;
+  color: var(--ink);
+}
+
+ul {
+  padding-inline-start: 20px;
+}
+
+li {
+  margin-bottom: 4px;
+}
+
+.skill-line {
+  font-size: 0.86rem;
+  margin-bottom: 4px;
+}
+
+.skill-line b {
+  color: var(--ink);
+}
+
+.role-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.role-line h3 {
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+
+.role-line .date {
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.proj {
+  margin-bottom: 6px;
+}
+
+.proj h3 {
+  font-size: 0.88rem;
+  color: var(--ink);
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .toolbar {
+    display: none;
+  }
+
+  .page {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+
+  @page {
+    margin: 14mm 16mm;
+  }
+}
+
+@media (max-width: 700px) {
+  .page {
+    padding: 28px 22px;
+  }
+}

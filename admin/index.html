@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-lock-lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self'; connect-src 'self' https://*.supabase.co; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; require-trusted-types-for 'script'; upgrade-insecure-requests">
+  <title>زيارات البورتفوليو</title>
+  <link rel="icon" type="image/png" href="../assets/favicon.png?v=20261007">
+  <script src="../boot.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <div class="space-bg" aria-hidden="true">
+    <span class="stars stars-one"></span>
+    <span class="stars stars-two"></span>
+    <span class="stars stars-three"></span>
+    <span class="orb orb-cyan"></span>
+    <span class="orb orb-violet"></span>
+  </div>
+
+  <main class="admin-shell">
+    <a class="admin-back" href="../index.html">العودة للبورتفوليو</a>
+
+    <section class="admin-panel" id="setup" hidden>
+      <div>
+        <p class="mini-title">سجل خاص</p>
+        <h1>تفعيل سجل الزيارات</h1>
+      </div>
+      <p class="admin-note">جيت هب بيدور الصفحة بس، ومش بيقدر يخزن الزيارات ولا يخبيها بكلمة سر جوه الملفات. عشان كده السجل بيتحفظ في Supabase، والقراءة بتتم بعد تسجيل دخولك.</p>
+      <p class="admin-warning" id="secretWarning" hidden>المفتاح المكتوب في الإعدادات مفتاح سري. سيبه في لوحة Supabase ومتحطوش في الموقع.</p>
+      <ol class="admin-steps">
+        <li>اعمل مشروع مجاني من supabase.com.</li>
+        <li>من SQL Editor شغّل ملف <span dir="ltr">supabase/visits.sql</span> مرة واحدة.</li>
+        <li>من Authentication اقفل تسجيل المستخدمين الجدد، وبعدين أضف مستخدم بإيميلك وكلمة سر، وفعّل Auto Confirm.</li>
+        <li>من Project Settings ثم API انسخ Project URL والمفتاح العام anon أو publishable فقط.</li>
+        <li>حط القيمتين في <span dir="ltr">analytics-config.js</span> وانشر الموقع.</li>
+      </ol>
+      <p class="admin-note">إيميل الدخول لازم يكون <span dir="ltr" id="ownerEmail"></span> لأنه مكتوب في سياسة القراءة. الصفحة بتعرض الدولة والمدينة والمصدر والجهاز، من غير عنوان IP ومن غير اسم الشخص.</p>
+    </section>
+
+    <section class="admin-panel" id="loginPanel" hidden>
+      <div>
+        <p class="mini-title">دخول المالك</p>
+        <h1>زيارات البورتفوليو</h1>
+      </div>
+      <p class="admin-note">السجل مش ظاهر لأي حد يفتح الرابط. كلمة السر بتترسل لـ Supabase بس، ومش متخزنة في كود الموقع.</p>
+      <form id="loginForm" method="post" action="">
+        <div class="admin-form">
+          <label for="email">البريد الإلكتروني
+            <input id="email" name="email" type="email" autocomplete="username" inputmode="email" required spellcheck="false">
+          </label>
+          <label for="password">كلمة السر
+            <input id="password" name="password" type="password" autocomplete="current-password" minlength="6" required>
+          </label>
+          <button class="btn primary" type="submit">دخول</button>
+          <p class="admin-error" id="loginError" role="alert" hidden></p>
+        </div>
+      </form>
+    </section>
+
+    <section class="admin-panel" id="dashboard" hidden>
+      <div>
+        <p class="mini-title">آخر الزيارات</p>
+        <h1>مين دخل ومنين</h1>
+      </div>
+      <p class="admin-note">الموقع مش بيعرف اسم الزائر. بتشوف مكان تقريبي، الموقع اللي جه منه، والجهاز. نفس الزائر خلال 30 دقيقة بيتسجل مرة واحدة، وعنوان الـ IP مش بيتخزن.</p>
+      <p class="admin-warning" id="emailWarning" hidden></p>
+      <div class="admin-stats">
+        <article class="admin-stat">
+          <span>إجمالي السجل</span>
+          <strong id="statTotal">0</strong>
+        </article>
+        <article class="admin-stat">
+          <span>زيارات اليوم</span>
+          <strong id="statToday">0</strong>
+        </article>
+        <article class="admin-stat">
+          <span>دول ظاهرة</span>
+          <strong id="statCountries">0</strong>
+        </article>
+      </div>
+      <div class="admin-actions">
+        <button class="btn primary" id="refreshButton" type="button">تحديث</button>
+        <button class="btn ghost" id="logoutButton" type="button">خروج</button>
+      </div>
+      <p id="tableStatus">جاري تحميل الزيارات...</p>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <caption class="admin-note">آخر 200 زيارة بتوقيت القاهرة</caption>
+          <thead>
+            <tr>
+              <th scope="col">الوقت</th>
+              <th scope="col">المكان</th>
+              <th scope="col">المصدر</th>
+              <th scope="col">الصفحة</th>
+              <th scope="col">الجهاز</th>
+              <th scope="col">المتصفح</th>
+              <th scope="col">اللغة</th>
+              <th scope="col">الزائر</th>
+            </tr>
+          </thead>
+          <tbody id="visitRows"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="../analytics-config.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

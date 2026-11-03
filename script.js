@@ -11,6 +11,11 @@ const langToggleFlag = document.querySelector("#langToggleFlag");
 const langToggleLabel = document.querySelector("#langToggleLabel");
 const langMenu = document.querySelector("#langMenu");
 const langOptions = document.querySelectorAll("#langMenu li");
+const supportedLangs = new Set(["en", "de", "es", "it", "tr", "ru", "zh", "ar"]);
+
+function normalizeLang(lang) {
+  return supportedLangs.has(lang) ? lang : "en";
+}
 
 if (year) {
   year.textContent = new Date().getFullYear();
@@ -23,6 +28,7 @@ themeToggle?.addEventListener("click", () => {
 });
 
 function applyLanguage(lang) {
+  lang = normalizeLang(lang);
   const dict = TRANSLATIONS[lang] || TRANSLATIONS.en;
   document.documentElement.lang = lang;
   document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
@@ -45,6 +51,7 @@ function applyLanguage(lang) {
 }
 
 function updateLangToggle(lang) {
+  lang = normalizeLang(lang);
   const option = document.querySelector(`#langMenu li[data-lang="${lang}"]`);
   if (!option || !langToggleFlag || !langToggleLabel) {
     return;
@@ -61,7 +68,11 @@ function closeLangMenu() {
   langToggle?.setAttribute("aria-expanded", "false");
 }
 
-const savedLang = localStorage.getItem("lang") || "en";
+const storedLang = localStorage.getItem("lang");
+const savedLang = normalizeLang(storedLang || "en");
+if (storedLang && storedLang !== savedLang) {
+  localStorage.removeItem("lang");
+}
 updateLangToggle(savedLang);
 applyLanguage(savedLang);
 
@@ -73,7 +84,7 @@ langToggle?.addEventListener("click", (event) => {
 
 langOptions.forEach((li) => {
   li.addEventListener("click", () => {
-    const lang = li.dataset.lang;
+    const lang = normalizeLang(li.dataset.lang);
     localStorage.setItem("lang", lang);
     updateLangToggle(lang);
     applyLanguage(lang);

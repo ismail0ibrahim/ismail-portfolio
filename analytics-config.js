@@ -1,7 +1,7 @@
 (function () {
   var config = {
     // Project Settings → API → Project URL
-    supabaseUrl: "https://odmlnbwxppvapinwbrwd.supabase.co",
+    supabaseUrl: "https://odmlnbwxppvaplnwbrwd.supabase.co",
     // anon JWT or sb_publishable key only. Never put service_role or sb_secret here.
     supabaseAnonKey: "sb_publishable_lWKMylvcTP19mZ_GFohaMQ_MQMMQcaQ",
     ownerEmail: "ismailofficialibrahim@gmail.com"

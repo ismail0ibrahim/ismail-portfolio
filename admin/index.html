@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" referrerpolicy="no-referrer">
   <link rel="stylesheet" href="../styles.css">
-  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="admin.css?v=4">
 </head>
 <body>
   <div class="space-bg" aria-hidden="true">
@@ -36,12 +36,12 @@
       <p class="admin-warning" id="secretWarning" hidden>المفتاح المكتوب في الإعدادات مفتاح سري. سيبه في لوحة Supabase ومتحطوش في الموقع.</p>
       <ol class="admin-steps">
         <li>اعمل مشروع مجاني من supabase.com.</li>
-        <li>من SQL Editor شغّل ملف <span dir="ltr">supabase/visits.sql</span> مرة واحدة.</li>
+        <li>من SQL Editor شغّل ملف <span dir="ltr">supabase/visits.sql</span>. لو شغّلته قبل كده، شغّله تاني عشان الأعمدة الجديدة. الزيارات القديمة مش بتتمسح.</li>
         <li>من Authentication اقفل تسجيل المستخدمين الجدد، وبعدين أضف مستخدم بإيميلك وكلمة سر، وفعّل Auto Confirm.</li>
         <li>من Project Settings ثم API انسخ Project URL والمفتاح العام anon أو publishable فقط.</li>
         <li>حط القيمتين في <span dir="ltr">analytics-config.js</span> وانشر الموقع.</li>
       </ol>
-      <p class="admin-note">إيميل الدخول لازم يكون <span dir="ltr" id="ownerEmail"></span> لأنه مكتوب في سياسة القراءة. الصفحة بتعرض الدولة والمدينة والمصدر والجهاز، من غير عنوان IP ومن غير اسم الشخص.</p>
+      <p class="admin-note">إيميل الدخول لازم يكون <span dir="ltr" id="ownerEmail"></span> لأنه مكتوب في سياسة القراءة. الصفحة بتعرض عنوان الـ IP والمكان التقريبي ومزود الإنترنت والجهاز. عنوان الماك مش متاح من المتصفح.</p>
     </section>
 
     <section class="admin-panel" id="loginPanel" hidden>
@@ -69,8 +69,9 @@
         <p class="mini-title">آخر الزيارات</p>
         <h1>مين دخل ومنين</h1>
       </div>
-      <p class="admin-note">الموقع مش بيعرف اسم الزائر. بتشوف مكان تقريبي، الموقع اللي جه منه، والجهاز. نفس الزائر خلال 30 دقيقة بيتسجل مرة واحدة، وعنوان الـ IP مش بيتخزن.</p>
+      <p class="admin-note">الموقع مش بيعرف اسم الزائر، والمتصفح مش بيبعت عنوان الماك. الزيارة بتحفظ عنوان الـ IP، ومكان تقريبي من الشبكة مع الإحداثيات والمنطقة الزمنية، ومزود الإنترنت، ونظام الجهاز ودقة الشاشة. نفس الزائر خلال 30 دقيقة بيتسجل مرة واحدة.</p>
       <p class="admin-warning" id="emailWarning" hidden></p>
+      <p class="admin-warning" id="schemaWarning" hidden>جدول الزيارات لسه على الأعمدة القديمة، فعنوان الـ IP والتفاصيل الجديدة مش هتظهر. من Supabase افتح SQL Editor وشغّل ملف <span dir="ltr">supabase/visits.sql</span> تاني. الملف بيضيف الأعمدة من غير ما يمسح السجل.</p>
       <div class="admin-stats">
         <article class="admin-stat">
           <span>إجمالي السجل</span>
@@ -97,6 +98,7 @@
             <tr>
               <th scope="col">الوقت</th>
               <th scope="col">المكان</th>
+              <th scope="col">الشبكة</th>
               <th scope="col">المصدر</th>
               <th scope="col">الصفحة</th>
               <th scope="col">الجهاز</th>
@@ -112,6 +114,6 @@
   </main>
 
   <script src="../analytics-config.js?v=3"></script>
-  <script src="admin.js"></script>
+  <script src="admin.js?v=4"></script>
 </body>
 </html>

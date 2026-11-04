@@ -11,6 +11,7 @@
   var emailWarning = document.querySelector("#emailWarning");
   var visitRows = document.querySelector("#visitRows");
   var tableStatus = document.querySelector("#tableStatus");
+  var schemaWarning = document.querySelector("#schemaWarning");
   var timeFormat = new Intl.DateTimeFormat("ar-EG", {
     dateStyle: "medium",
     timeStyle: "short",
@@ -98,12 +99,27 @@
     return data.access_token;
   }
 
-  function cell(text, className) {
+  function cell(value, className, sub, subDir, extraNode) {
     var item = document.createElement("td");
     if (className) {
       item.className = className;
     }
-    item.textContent = text;
+    if (className && className.split(" ").indexOf("ltr") !== -1) {
+      item.dir = "ltr";
+    }
+    item.textContent = value;
+    if (sub) {
+      var extra = document.createElement("span");
+      extra.className = "admin-sub";
+      if (subDir) {
+        extra.dir = subDir;
+      }
+      extra.textContent = sub;
+      item.append(extra);
+    }
+    if (extraNode) {
+      item.append(extraNode);
+    }
     return item;
   }
 
@@ -133,6 +149,83 @@
       return "الرئيسية";
     }
     return page || "الرئيسية";
+  }
+
+  function placeSub(row) {
+    var parts = [];
+    var latitude = Number(row.latitude);
+    var longitude = Number(row.longitude);
+    if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
+      parts.push("\u200e" + latitude.toFixed(2) + ", " + longitude.toFixed(2));
+    }
+    if (row.timezone) {
+      parts.push("\u200e" + row.timezone);
+    }
+    if (row.accuracy_km) {
+      parts.push("±" + row.accuracy_km + " كم");
+    }
+    return parts.join(" · ");
+  }
+
+  function mapAnchor(row) {
+    var latitude = Number(row.latitude);
+    var longitude = Number(row.longitude);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+      return null;
+    }
+    var latitudeText = latitude.toFixed(4);
+    var longitudeText = longitude.toFixed(4);
+    var link = document.createElement("a");
+    link.className = "admin-sub";
+    link.href = "https://www.openstreetmap.org/?mlat=" + encodeURIComponent(latitudeText) + "&mlon=" + encodeURIComponent(longitudeText) + "#map=11/" + encodeURIComponent(latitudeText) + "/" + encodeURIComponent(longitudeText);
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = "الخريطة";
+    return link;
+  }
+
+  function ipLabel(row) {
+    if (!Object.prototype.hasOwnProperty.call(row, "ip")) {
+      return "—";
+    }
+    return row.ip || "غير متاح";
+  }
+
+  function networkSub(row) {
+    var parts = [];
+    if (row.isp) {
+      parts.push(row.isp);
+    }
+    if (row.asn) {
+      parts.push("AS" + row.asn);
+    }
+    return parts.join(" · ");
+  }
+
+  function deviceSub(row) {
+    var parts = [];
+    if (row.os) {
+      parts.push(row.os_version ? row.os + " " + row.os_version : row.os);
+    }
+    if (row.architecture) {
+      parts.push(row.architecture);
+    }
+    if (row.model) {
+      parts.push(row.model);
+    }
+    if (row.screen) {
+      parts.push(String(row.screen).replace("x", "×"));
+    }
+    return parts.join(" · ");
+  }
+
+  function browserLabel(row) {
+    var name = row.browser || "";
+    var major = String(row.browser_version || "").split(".")[0];
+    if (name && /^[0-9]+$/.test(major)) {
+      return name + " " + major;
+    }
+    return name;
   }
 
   function render(rows, total) {
@@ -166,13 +259,14 @@
       var line = document.createElement("tr");
       line.append(
         cell(Number.isNaN(created.valueOf()) ? "" : timeFormat.format(created)),
-        cell(placeLabel(row), "place"),
+        cell(placeLabel(row), "place", placeSub(row), "", mapAnchor(row)),
+        cell(ipLabel(row), "ltr stack", networkSub(row), "ltr"),
         cell(sourceLabel(row.referrer), "source"),
         cell(pageLabel(row.page)),
-        cell(row.device === "Mobile" ? "موبايل" : "كمبيوتر"),
-        cell(row.browser || ""),
-        cell(String(row.language || "").toUpperCase()),
-        cell(row.visitor_key || "")
+        cell(row.device === "Mobile" ? "موبايل" : "كمبيوتر", "stack", deviceSub(row), "ltr"),
+        cell(browserLabel(row), "ltr"),
+        cell(String(row.language || "").toUpperCase(), "ltr", row.browser_language || "", "ltr"),
+        cell(row.visitor_key || "", "ltr")
       );
       visitRows.append(line);
     });
@@ -201,17 +295,30 @@
       emailWarning.hidden = true;
     }
 
-    var response = await fetch(analytics.origin + "/rest/v1/visits?select=created_at,country,country_code,city,region,referrer,page,language,device,browser,visitor_key&order=created_at.desc&limit=200", {
-      headers: {
-        apikey: analytics.anonKey,
-        Authorization: "Bearer " + token,
-        Accept: "application/json",
-        Prefer: "count=exact"
-      },
-      credentials: "omit",
-      referrerPolicy: "no-referrer",
-      cache: "no-store"
-    });
+    var baseSelect = "created_at,country,country_code,city,region,referrer,page,language,device,browser,visitor_key";
+    var richSelect = baseSelect + ",ip,latitude,longitude,timezone,isp,asn,accuracy_km,os,os_version,architecture,model,screen,browser_version,browser_language";
+
+    async function requestVisits(select) {
+      return fetch(analytics.origin + "/rest/v1/visits?select=" + select + "&order=created_at.desc&limit=200", {
+        headers: {
+          apikey: analytics.anonKey,
+          Authorization: "Bearer " + token,
+          Accept: "application/json",
+          Prefer: "count=exact"
+        },
+        credentials: "omit",
+        referrerPolicy: "no-referrer",
+        cache: "no-store"
+      });
+    }
+
+    var response = await requestVisits(richSelect);
+    var legacySchema = false;
+    if (response.status === 400) {
+      legacySchema = true;
+      response = await requestVisits(baseSelect);
+    }
+    schemaWarning.hidden = !legacySchema;
 
     if (response.status === 401 || response.status === 403) {
       clearSession();

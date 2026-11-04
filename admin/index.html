@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" referrerpolicy="no-referrer">
   <link rel="stylesheet" href="../styles.css">
-  <link rel="stylesheet" href="admin.css?v=4">
+  <link rel="stylesheet" href="admin.css?v=5">
 </head>
 <body>
   <div class="space-bg" aria-hidden="true">
@@ -90,6 +90,7 @@
         <button class="btn primary" id="refreshButton" type="button">تحديث</button>
         <button class="btn ghost" id="logoutButton" type="button">خروج</button>
       </div>
+      <p class="admin-note" id="legacyNote" hidden>الزيارات القديمة اتسجلت قبل إضافة البيانات دي، فحقولها فاضية. أي زيارة جديدة هتملا عنوان الـ IP والشبكة والإحداثيات والجهاز.</p>
       <p id="tableStatus">جاري تحميل الزيارات...</p>
       <div class="admin-table-wrap">
         <table class="admin-table">
@@ -98,7 +99,6 @@
             <tr>
               <th scope="col">الوقت</th>
               <th scope="col">المكان</th>
-              <th scope="col">الشبكة</th>
               <th scope="col">المصدر</th>
               <th scope="col">الصفحة</th>
               <th scope="col">الجهاز</th>
@@ -114,6 +114,6 @@
   </main>
 
   <script src="../analytics-config.js?v=3"></script>
-  <script src="admin.js?v=4"></script>
+  <script src="admin.js?v=5"></script>
 </body>
 </html>

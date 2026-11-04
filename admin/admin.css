@@ -156,18 +156,49 @@
 }
 
 .admin-table td.source,
-.admin-table td.place,
-.admin-table td.stack {
+.admin-table td.place {
   white-space: normal;
   min-width: 9rem;
 }
 
-.admin-sub {
-  display: block;
-  margin-top: 3px;
+.admin-table tr.visit-main td {
+  border-bottom: 0;
+  padding-bottom: 8px;
+}
+
+.admin-table tr.visit-more td {
+  white-space: normal;
+  padding-top: 0;
+  background: var(--chip-bg);
+}
+
+.visit-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 10px 14px;
+  margin: 0;
+  padding-block: 4px 8px;
+}
+
+.visit-details div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.visit-details dt {
   color: var(--muted);
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.visit-details dd {
+  margin: 0;
+  font-weight: 700;
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: start;
+  overflow-wrap: anywhere;
 }
 
 .admin-table a {

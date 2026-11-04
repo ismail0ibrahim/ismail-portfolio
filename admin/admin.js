@@ -151,72 +151,73 @@
     return page || "الرئيسية";
   }
 
-  function placeSub(row) {
-    var parts = [];
-    var latitude = Number(row.latitude);
-    var longitude = Number(row.longitude);
-    if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
-      parts.push("\u200e" + latitude.toFixed(2) + ", " + longitude.toFixed(2));
-    }
-    if (row.timezone) {
-      parts.push("\u200e" + row.timezone);
-    }
-    if (row.accuracy_km) {
-      parts.push("±" + row.accuracy_km + " كم");
-    }
-    return parts.join(" · ");
+  function empty(value) {
+    return value == null || value === "";
   }
 
-  function mapAnchor(row) {
+  function coordinates(row) {
+    if (empty(row.latitude) || empty(row.longitude)) {
+      return null;
+    }
     var latitude = Number(row.latitude);
     var longitude = Number(row.longitude);
     if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
       return null;
     }
-    var latitudeText = latitude.toFixed(4);
-    var longitudeText = longitude.toFixed(4);
-    var link = document.createElement("a");
-    link.className = "admin-sub";
-    link.href = "https://www.openstreetmap.org/?mlat=" + encodeURIComponent(latitudeText) + "&mlon=" + encodeURIComponent(longitudeText) + "#map=11/" + encodeURIComponent(latitudeText) + "/" + encodeURIComponent(longitudeText);
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    link.textContent = "الخريطة";
-    return link;
+    return { latitude: latitude, longitude: longitude };
   }
 
-  function ipLabel(row) {
-    if (!Object.prototype.hasOwnProperty.call(row, "ip")) {
-      return "—";
-    }
-    return row.ip || "غير متاح";
+  function mapHref(point) {
+    var latitude = point.latitude.toFixed(4);
+    var longitude = point.longitude.toFixed(4);
+    return "https://www.openstreetmap.org/?mlat=" + encodeURIComponent(latitude) + "&mlon=" + encodeURIComponent(longitude) + "#map=11/" + encodeURIComponent(latitude) + "/" + encodeURIComponent(longitude);
   }
 
-  function networkSub(row) {
-    var parts = [];
-    if (row.isp) {
-      parts.push(row.isp);
+  function detailItem(label, value, href) {
+    var item = document.createElement("div");
+    var term = document.createElement("dt");
+    var desc = document.createElement("dd");
+    term.textContent = label;
+    if (!empty(value) && href) {
+      var link = document.createElement("a");
+      link.href = href;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = value;
+      desc.append(link);
+    } else {
+      desc.textContent = empty(value) ? "—" : String(value);
     }
-    if (row.asn) {
-      parts.push("AS" + row.asn);
-    }
-    return parts.join(" · ");
+    item.append(term, desc);
+    return item;
   }
 
-  function deviceSub(row) {
-    var parts = [];
-    if (row.os) {
-      parts.push(row.os_version ? row.os + " " + row.os_version : row.os);
-    }
-    if (row.architecture) {
-      parts.push(row.architecture);
-    }
-    if (row.model) {
-      parts.push(row.model);
-    }
-    if (row.screen) {
-      parts.push(String(row.screen).replace("x", "×"));
-    }
-    return parts.join(" · ");
+  function detailsRow(row) {
+    var point = coordinates(row);
+    var line = document.createElement("tr");
+    var holder = document.createElement("td");
+    var list = document.createElement("dl");
+    line.className = "visit-more";
+    holder.colSpan = 8;
+    list.className = "visit-details";
+    list.append(
+      detailItem("IP", row.ip || ""),
+      detailItem("مزود الإنترنت", row.isp || ""),
+      detailItem("رقم الشبكة", row.asn ? "AS" + row.asn : ""),
+      detailItem("الإحداثيات", point ? point.latitude.toFixed(2) + ", " + point.longitude.toFixed(2) : "", point ? mapHref(point) : ""),
+      detailItem("المنطقة الزمنية", row.timezone || ""),
+      detailItem("دقة المكان", row.accuracy_km == null || row.accuracy_km === "" ? "" : "±" + row.accuracy_km + " كم"),
+      detailItem("النظام", row.os || ""),
+      detailItem("إصدار النظام", row.os_version || ""),
+      detailItem("المعمارية", row.architecture || ""),
+      detailItem("الموديل", row.model || ""),
+      detailItem("الشاشة", row.screen ? String(row.screen).replace(/x/g, "×") : ""),
+      detailItem("إصدار المتصفح", row.browser_version || ""),
+      detailItem("لغة المتصفح", row.browser_language || "")
+    );
+    holder.append(list);
+    line.append(holder);
+    return line;
   }
 
   function browserLabel(row) {
@@ -257,20 +258,23 @@
       }
 
       var line = document.createElement("tr");
+      line.className = "visit-main";
       line.append(
         cell(Number.isNaN(created.valueOf()) ? "" : timeFormat.format(created)),
-        cell(placeLabel(row), "place", placeSub(row), "", mapAnchor(row)),
-        cell(ipLabel(row), "ltr stack", networkSub(row), "ltr"),
+        cell(placeLabel(row), "place"),
         cell(sourceLabel(row.referrer), "source"),
         cell(pageLabel(row.page)),
-        cell(row.device === "Mobile" ? "موبايل" : "كمبيوتر", "stack", deviceSub(row), "ltr"),
+        cell(row.device === "Mobile" ? "موبايل" : "كمبيوتر"),
         cell(browserLabel(row), "ltr"),
-        cell(String(row.language || "").toUpperCase(), "ltr", row.browser_language || "", "ltr"),
+        cell(String(row.language || "").toUpperCase(), "ltr"),
         cell(row.visitor_key || "", "ltr")
       );
-      visitRows.append(line);
+      visitRows.append(line, detailsRow(row));
     });
 
+    document.querySelector("#legacyNote").hidden = !rows.some(function (row) {
+      return !row.ip && !row.os;
+    });
     document.querySelector("#statTotal").textContent = numberFormat.format(total);
     document.querySelector("#statToday").textContent = numberFormat.format(todayCount);
     document.querySelector("#statCountries").textContent = numberFormat.format(countries.size);

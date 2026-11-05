@@ -46,11 +46,27 @@
     }
   }
 
-  function deviceClass() {
-    if (navigator.userAgentData && typeof navigator.userAgentData.mobile === "boolean") {
-      return navigator.userAgentData.mobile ? "Mobile" : "Desktop";
+  function deviceClass(hints) {
+    var platform = (hints && hints.os) || "";
+    var lowPlatform = navigator.userAgentData && navigator.userAgentData.platform;
+    var factors = hints && hints.formFactors;
+    if (Array.isArray(factors)) {
+      for (var i = 0; i < factors.length; i += 1) {
+        if (/Mobile|Tablet/i.test(String(factors[i] || ""))) {
+          return "Mobile";
+        }
+      }
     }
-    return /Mobi|Android/i.test(navigator.userAgent || "") ? "Mobile" : "Desktop";
+    if (platform === "Android" || platform === "iOS" || lowPlatform === "Android" || lowPlatform === "iOS") {
+      return "Mobile";
+    }
+    if (navigator.userAgentData && navigator.userAgentData.mobile === true) {
+      return "Mobile";
+    }
+    if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "")) {
+      return "Mobile";
+    }
+    return "Desktop";
   }
 
   function browserClass() {
@@ -165,6 +181,36 @@
     return model.length > 1 ? model : "";
   }
 
+  function modelFromUa(ua) {
+    var match = /Android [^;)]*;\s*([^;)]+)/i.exec(ua || "");
+    if (!match) {
+      return "";
+    }
+    var token = text(match[1], 80).replace(/\s+Build.*$/i, "");
+    if (token.length < 2 || /^(K|Android|Mobile|Linux|HarmonyOS)$/i.test(token)) {
+      return "";
+    }
+    return token;
+  }
+
+  function friendlyModel(model) {
+    var value = modelName(model);
+    if (!value) {
+      return "";
+    }
+    var compact = value.replace(/\s+/g, "");
+    if (/^SM-M556/i.test(compact)) {
+      return "Samsung Galaxy M55";
+    }
+    if (/^SM-/i.test(compact)) {
+      return "Samsung " + compact.toUpperCase();
+    }
+    if (/^Galaxy\b/i.test(value)) {
+      return "Samsung " + value;
+    }
+    return value;
+  }
+
   function browserLanguage() {
     var value = text(navigator.language || "", 35);
     return /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8}){0,2}$/.test(value) ? value : "";
@@ -237,11 +283,13 @@
 
   function clientHints() {
     var browser = browserClass();
+    var lowPlatform = navigator.userAgentData && navigator.userAgentData.platform;
     var base = {
-      os: osName("", navigator.userAgent || ""),
+      os: osName(lowPlatform || "", navigator.userAgent || ""),
       os_version: "",
       architecture: "",
       model: "",
+      formFactors: [],
       browser_version: matchingVersion(navigator.userAgentData && navigator.userAgentData.brands, browser)
     };
     var uaData = navigator.userAgentData;
@@ -253,15 +301,17 @@
       "platformVersion",
       "architecture",
       "model",
-      "fullVersionList"
-    ]), 1500).then(function (hints) {
+      "fullVersionList",
+      "formFactors"
+    ]), 3500).then(function (hints) {
       if (!hints) {
         return base;
       }
-      base.os = osName(hints.platform || "", navigator.userAgent || "");
+      base.os = osName(hints.platform || lowPlatform || "", navigator.userAgent || "");
       base.os_version = versionText(hints.platformVersion);
       base.architecture = architectureName(hints.architecture);
       base.model = modelName(hints.model);
+      base.formFactors = Array.isArray(hints.formFactors) ? hints.formFactors.slice(0, 4) : [];
       var fullVersion = matchingVersion(hints.fullVersionList, browser);
       if (fullVersion) {
         base.browser_version = fullVersion;
@@ -275,7 +325,7 @@
     if (!ip || !crypto.subtle) {
       return randomKey();
     }
-    var bytes = new TextEncoder().encode(ip + "|" + day);
+    var bytes = new TextEncoder().encode(ip + "|" + day + "|2");
     var digest = await crypto.subtle.digest("SHA-256", bytes);
     return hex(new Uint8Array(digest).slice(0, 6));
   }
@@ -338,12 +388,12 @@
     });
   }
 
-  function loadGeo() {
+  function loadJson(url, ms) {
     var controller = new AbortController();
     var timer = setTimeout(function () {
       controller.abort();
-    }, 2500);
-    return fetch("https://get.geojs.io/v1/ip/geo.json", {
+    }, ms);
+    return fetch(url, {
       signal: controller.signal,
       credentials: "omit",
       referrerPolicy: "no-referrer",
@@ -352,40 +402,301 @@
       return response.ok ? response.json() : null;
     }).catch(function () {
       return null;
-    }).then(function (geo) {
+    }).then(function (data) {
       clearTimeout(timer);
-      return geo;
+      return data;
+    });
+  }
+
+  function isPublicIp(ip) {
+    if (!ip) {
+      return false;
+    }
+    var parts = ip.split(".");
+    if (parts.length === 4) {
+      var a = Number(parts[0]);
+      var b = Number(parts[1]);
+      if (a === 0 || a === 10 || a === 127) return false;
+      if (a === 169 && b === 254) return false;
+      if (a === 192 && b === 168) return false;
+      if (a === 172 && b >= 16 && b <= 31) return false;
+      if (a === 100 && b >= 64 && b <= 127) return false;
+      return true;
+    }
+    var v6 = ip.toLowerCase();
+    if (v6 === "::1" || v6.indexOf("fe80:") === 0 || v6.indexOf("fc") === 0 || v6.indexOf("fd") === 0) {
+      return false;
+    }
+    return v6.indexOf(":") !== -1;
+  }
+
+  function isCountryCentroid(latitude, longitude) {
+    if (latitude == null || longitude == null) {
+      return false;
+    }
+    return Math.abs(latitude - 37.751) < 0.05 && Math.abs(longitude + 97.822) < 0.05;
+  }
+
+  function isHostedNetwork(geo) {
+    var asn = geo.asn || "";
+    if (/^(15169|396982|16509|14618|13335|8075|14061|16276)$/.test(asn)) {
+      return true;
+    }
+    return /Google LLC|Google Cloud|Amazon|AWS|Microsoft|Cloudflare|DigitalOcean|Akamai|Fastly/i.test(geo.isp || "");
+  }
+
+  function isCoarse(geo) {
+    if (!geo || geo.unreliable || !isPublicIp(geo.ip)) return true;
+    if (isHostedNetwork(geo)) return true;
+    if (geo.accuracy != null && geo.accuracy >= 400) return true;
+    if (isCountryCentroid(geo.latitude, geo.longitude)) return true;
+    if (!geo.city) return true;
+    return false;
+  }
+
+  function markUnreliable(list) {
+    var coarseIp = {};
+    (list || []).forEach(function (geo) {
+      if (!geo || !geo.ip) {
+        return;
+      }
+      if ((geo.accuracy != null && geo.accuracy >= 400) || isCountryCentroid(geo.latitude, geo.longitude) || isHostedNetwork(geo)) {
+        coarseIp[geo.ip] = true;
+      }
+    });
+    (list || []).forEach(function (geo) {
+      if (geo && coarseIp[geo.ip]) {
+        geo.unreliable = true;
+      }
+    });
+  }
+
+  function zoneCountry(zone) {
+    var zones = {
+      "Africa/Cairo": ["EG", "Egypt"],
+      "Africa/Tripoli": ["LY", "Libya"],
+      "Africa/Khartoum": ["SD", "Sudan"],
+      "Africa/Juba": ["SS", "South Sudan"],
+      "Africa/Nairobi": ["KE", "Kenya"],
+      "Africa/Addis_Ababa": ["ET", "Ethiopia"],
+      "Africa/Lagos": ["NG", "Nigeria"],
+      "Africa/Johannesburg": ["ZA", "South Africa"],
+      "Africa/Casablanca": ["MA", "Morocco"],
+      "Africa/Algiers": ["DZ", "Algeria"],
+      "Africa/Tunis": ["TN", "Tunisia"],
+      "Africa/Accra": ["GH", "Ghana"],
+      "Africa/Dar_es_Salaam": ["TZ", "Tanzania"],
+      "Africa/Kampala": ["UG", "Uganda"],
+      "Asia/Riyadh": ["SA", "Saudi Arabia"],
+      "Asia/Dubai": ["AE", "United Arab Emirates"],
+      "Asia/Kuwait": ["KW", "Kuwait"],
+      "Asia/Qatar": ["QA", "Qatar"],
+      "Asia/Bahrain": ["BH", "Bahrain"],
+      "Asia/Muscat": ["OM", "Oman"],
+      "Asia/Baghdad": ["IQ", "Iraq"],
+      "Asia/Amman": ["JO", "Jordan"],
+      "Asia/Beirut": ["LB", "Lebanon"],
+      "Asia/Damascus": ["SY", "Syria"],
+      "Asia/Gaza": ["PS", "Palestine"],
+      "Asia/Hebron": ["PS", "Palestine"],
+      "Asia/Aden": ["YE", "Yemen"],
+      "Asia/Jerusalem": ["IL", "Israel"],
+      "Asia/Tehran": ["IR", "Iran"],
+      "Europe/Istanbul": ["TR", "Turkey"],
+      "Asia/Karachi": ["PK", "Pakistan"],
+      "Asia/Kolkata": ["IN", "India"],
+      "Asia/Calcutta": ["IN", "India"],
+      "Asia/Dhaka": ["BD", "Bangladesh"],
+      "Asia/Jakarta": ["ID", "Indonesia"],
+      "Asia/Singapore": ["SG", "Singapore"],
+      "Asia/Kuala_Lumpur": ["MY", "Malaysia"],
+      "Asia/Manila": ["PH", "Philippines"],
+      "Asia/Bangkok": ["TH", "Thailand"],
+      "Asia/Ho_Chi_Minh": ["VN", "Vietnam"],
+      "Asia/Shanghai": ["CN", "China"],
+      "Asia/Hong_Kong": ["HK", "Hong Kong"],
+      "Asia/Taipei": ["TW", "Taiwan"],
+      "Asia/Tokyo": ["JP", "Japan"],
+      "Asia/Seoul": ["KR", "South Korea"],
+      "Australia/Sydney": ["AU", "Australia"],
+      "Australia/Melbourne": ["AU", "Australia"],
+      "Australia/Perth": ["AU", "Australia"],
+      "Australia/Brisbane": ["AU", "Australia"],
+      "Pacific/Auckland": ["NZ", "New Zealand"],
+      "Europe/London": ["GB", "United Kingdom"],
+      "Europe/Paris": ["FR", "France"],
+      "Europe/Berlin": ["DE", "Germany"],
+      "Europe/Rome": ["IT", "Italy"],
+      "Europe/Madrid": ["ES", "Spain"],
+      "Europe/Amsterdam": ["NL", "Netherlands"],
+      "Europe/Brussels": ["BE", "Belgium"],
+      "Europe/Zurich": ["CH", "Switzerland"],
+      "Europe/Vienna": ["AT", "Austria"],
+      "Europe/Stockholm": ["SE", "Sweden"],
+      "Europe/Oslo": ["NO", "Norway"],
+      "Europe/Copenhagen": ["DK", "Denmark"],
+      "Europe/Helsinki": ["FI", "Finland"],
+      "Europe/Warsaw": ["PL", "Poland"],
+      "Europe/Prague": ["CZ", "Czechia"],
+      "Europe/Athens": ["GR", "Greece"],
+      "Europe/Bucharest": ["RO", "Romania"],
+      "Europe/Moscow": ["RU", "Russia"],
+      "America/New_York": ["US", "United States"],
+      "America/Detroit": ["US", "United States"],
+      "America/Chicago": ["US", "United States"],
+      "America/Denver": ["US", "United States"],
+      "America/Phoenix": ["US", "United States"],
+      "America/Los_Angeles": ["US", "United States"],
+      "America/Anchorage": ["US", "United States"],
+      "Pacific/Honolulu": ["US", "United States"],
+      "America/Toronto": ["CA", "Canada"],
+      "America/Vancouver": ["CA", "Canada"],
+      "America/Mexico_City": ["MX", "Mexico"],
+      "America/Sao_Paulo": ["BR", "Brazil"],
+      "America/Argentina/Buenos_Aires": ["AR", "Argentina"],
+      "America/Bogota": ["CO", "Colombia"],
+      "America/Lima": ["PE", "Peru"],
+      "America/Santiago": ["CL", "Chile"]
+    };
+    return zones[zone] || null;
+  }
+
+  function fromGeojs(data) {
+    if (!data || !data.ip) {
+      return null;
+    }
+    var code = text(data.country_code, 2).toUpperCase();
+    return {
+      ip: cleanIp(data.ip),
+      country: text(data.country, 80),
+      country_code: /^[A-Z]{2}$/.test(code) ? code : "",
+      city: text(data.city, 80),
+      region: text(data.region, 80),
+      latitude: coordinate(data.latitude, -90, 90),
+      longitude: coordinate(data.longitude, -180, 180),
+      accuracy: accuracyKm(data.accuracy),
+      timezone: timezoneName(data.timezone),
+      isp: ispName(data),
+      asn: asnValue(data.asn)
+    };
+  }
+
+  function fromIpwho(data) {
+    if (!data || data.success === false || !data.ip) {
+      return null;
+    }
+    var connection = data.connection || {};
+    var zone = data.timezone || {};
+    var code = text(data.country_code, 2).toUpperCase();
+    return {
+      ip: cleanIp(data.ip),
+      country: text(data.country, 80),
+      country_code: /^[A-Z]{2}$/.test(code) ? code : "",
+      city: text(data.city, 80),
+      region: text(data.region, 80),
+      latitude: coordinate(data.latitude, -90, 90),
+      longitude: coordinate(data.longitude, -180, 180),
+      accuracy: null,
+      timezone: timezoneName(zone.id || ""),
+      isp: text(connection.isp || connection.org || "", 120),
+      asn: asnValue(connection.asn)
+    };
+  }
+
+  function geoScore(geo, deviceCode) {
+    if (!geo || !isPublicIp(geo.ip)) {
+      return -100;
+    }
+    var score = 1;
+    if (!isCoarse(geo)) score += 6;
+    if (geo.city) score += 1;
+    if (deviceCode && geo.country_code === deviceCode) score += 5;
+    if (deviceCode && geo.country_code && geo.country_code !== deviceCode) score -= 3;
+    return score;
+  }
+
+  function locationFields(list) {
+    markUnreliable(list);
+    var deviceZone = browserTimezone();
+    var deviceCountry = zoneCountry(deviceZone);
+    var deviceCode = deviceCountry ? deviceCountry[0] : "";
+    var geo = null;
+    var bestScore = -100;
+    (list || []).forEach(function (item) {
+      var score = geoScore(item, deviceCode);
+      if (score > bestScore) {
+        geo = item;
+        bestScore = score;
+      }
+    });
+    var place = {
+      country: "",
+      country_code: "",
+      city: "",
+      region: "",
+      latitude: null,
+      longitude: null,
+      accuracy_km: null,
+      timezone: deviceZone,
+      isp: geo ? geo.isp : "",
+      asn: geo ? geo.asn : "",
+      ip: geo && isPublicIp(geo.ip) ? geo.ip : ""
+    };
+    if (geo && !isCoarse(geo)) {
+      place.country = geo.country;
+      place.country_code = geo.country_code;
+      place.city = geo.city;
+      place.region = geo.region;
+      place.latitude = geo.latitude;
+      place.longitude = geo.longitude;
+      place.accuracy_km = geo.accuracy;
+    } else if (deviceCountry) {
+      place.country = deviceCountry[1];
+      place.country_code = deviceCountry[0];
+    } else if (geo) {
+      place.country = geo.country;
+      place.country_code = geo.country_code;
+    }
+    return place;
+  }
+
+  function loadGeo() {
+    return Promise.all([
+      loadJson("https://get.geojs.io/v1/ip/geo.json", 4000).then(fromGeojs),
+      loadJson("https://ipwho.is/", 4000).then(fromIpwho)
+    ]).then(function (list) {
+      return list.filter(Boolean);
     });
   }
 
   Promise.all([loadGeo(), clientHints()]).then(function (results) {
-    var geo = results[0];
     var hints = results[1] || {};
-    var countryCode = text(geo && geo.country_code, 2).toUpperCase();
+    var place = locationFields(results[0]);
+    var model = friendlyModel(hints.model) || friendlyModel(modelFromUa(navigator.userAgent || ""));
     var visit = {
       page: pagePath(),
       language: languages[document.documentElement.lang] ? document.documentElement.lang : "en",
       referrer: referrerHost(document.referrer),
-      device: deviceClass(),
+      device: deviceClass(hints),
       browser: browserClass(),
       browser_version: hints.browser_version || "",
       browser_language: browserLanguage(),
       os: systems[hints.os] ? hints.os : "Other",
       os_version: hints.os_version || "",
       architecture: hints.architecture || "",
-      model: hints.model || "",
+      model: model,
       screen: screenSize(),
-      country: text(geo && geo.country, 80),
-      country_code: /^[A-Z]{2}$/.test(countryCode) ? countryCode : "",
-      city: text(geo && geo.city, 80),
-      region: text(geo && geo.region, 80),
-      timezone: timezoneName(geo && geo.timezone) || browserTimezone(),
-      isp: ispName(geo),
-      asn: asnValue(geo && geo.asn),
-      ip: cleanIp(geo && geo.ip),
-      latitude: coordinate(geo && geo.latitude, -90, 90),
-      longitude: coordinate(geo && geo.longitude, -180, 180),
-      accuracy_km: accuracyKm(geo && geo.accuracy),
+      country: place.country,
+      country_code: place.country_code,
+      city: place.city,
+      region: place.region,
+      timezone: place.timezone,
+      isp: place.isp,
+      asn: place.asn,
+      ip: place.ip,
+      latitude: place.latitude,
+      longitude: place.longitude,
+      accuracy_km: place.accuracy_km,
       visitor_key: ""
     };
     if (visit.latitude == null) delete visit.latitude;

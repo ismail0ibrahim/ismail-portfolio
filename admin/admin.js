@@ -12,9 +12,13 @@
   var visitRows = document.querySelector("#visitRows");
   var tableStatus = document.querySelector("#tableStatus");
   var schemaWarning = document.querySelector("#schemaWarning");
-  var timeFormat = new Intl.DateTimeFormat("ar-EG", {
-    dateStyle: "medium",
-    timeStyle: "short",
+  var timeFormat = new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
     timeZone: "Africa/Cairo"
   });
   var numberFormat = new Intl.NumberFormat("ar-EG");
@@ -99,35 +103,36 @@
     return data.access_token;
   }
 
-  function cell(value, className, sub, subDir, extraNode) {
+  function cell(value, className, label) {
     var item = document.createElement("td");
+    var text = document.createElement("span");
+    var classes = className ? className.split(/\s+/) : [];
     if (className) {
       item.className = className;
     }
-    if (className && className.split(" ").indexOf("ltr") !== -1) {
-      item.dir = "ltr";
+    if (label) {
+      item.dataset.label = label;
     }
-    item.textContent = value;
-    if (sub) {
-      var extra = document.createElement("span");
-      extra.className = "admin-sub";
-      if (subDir) {
-        extra.dir = subDir;
-      }
-      extra.textContent = sub;
-      item.append(extra);
+    if (classes.indexOf("ltr") !== -1) {
+      text.dir = "ltr";
     }
-    if (extraNode) {
-      item.append(extraNode);
-    }
+    text.textContent = value == null || value === "" ? "—" : String(value);
+    item.append(text);
     return item;
+  }
+
+  function isLatinText(value) {
+    return !!value && !/[\u0590-\u08FF]/.test(value);
   }
 
   function placeLabel(row) {
     var parts = [row.city, row.region, row.country].filter(function (part, index, all) {
       return part && all.indexOf(part) === index;
     });
-    return parts.join("، ") || "غير معروف";
+    if (!parts.length) {
+      return "غير معروف";
+    }
+    return parts.join(parts.every(isLatinText) ? ", " : "، ");
   }
 
   function sourceLabel(referrer) {
@@ -173,7 +178,7 @@
     return "https://www.openstreetmap.org/?mlat=" + encodeURIComponent(latitude) + "&mlon=" + encodeURIComponent(longitude) + "#map=11/" + encodeURIComponent(latitude) + "/" + encodeURIComponent(longitude);
   }
 
-  function detailItem(label, value, href) {
+  function detailItem(label, value, href, mode) {
     var item = document.createElement("div");
     var term = document.createElement("dt");
     var desc = document.createElement("dd");
@@ -183,39 +188,71 @@
       link.href = href;
       link.target = "_blank";
       link.rel = "noopener noreferrer";
+      link.dir = "ltr";
       link.textContent = value;
+      desc.dir = "ltr";
       desc.append(link);
+    } else if (mode === "accuracy" && !empty(value)) {
+      var amount = document.createElement("bdi");
+      amount.dir = "ltr";
+      amount.textContent = "±" + value;
+      desc.append(amount, document.createTextNode(" كم"));
     } else {
       desc.textContent = empty(value) ? "—" : String(value);
+      if (mode === "latin" && !empty(value)) {
+        desc.dir = "ltr";
+      }
     }
     item.append(term, desc);
     return item;
+  }
+
+  function detailGroup(title, items) {
+    var group = document.createElement("div");
+    var heading = document.createElement("p");
+    var list = document.createElement("dl");
+    group.className = "visit-group";
+    heading.className = "visit-group-title";
+    heading.textContent = title;
+    items.forEach(function (item) {
+      list.append(item);
+    });
+    group.append(heading, list);
+    return group;
   }
 
   function detailsRow(row) {
     var point = coordinates(row);
     var line = document.createElement("tr");
     var holder = document.createElement("td");
-    var list = document.createElement("dl");
+    var board = document.createElement("div");
     line.className = "visit-more";
     holder.colSpan = 8;
-    list.className = "visit-details";
-    list.append(
-      detailItem("IP", row.ip || ""),
-      detailItem("مزود الإنترنت", row.isp || ""),
-      detailItem("رقم الشبكة", row.asn ? "AS" + row.asn : ""),
-      detailItem("الإحداثيات", point ? point.latitude.toFixed(2) + ", " + point.longitude.toFixed(2) : "", point ? mapHref(point) : ""),
-      detailItem("المنطقة الزمنية", row.timezone || ""),
-      detailItem("دقة المكان", row.accuracy_km == null || row.accuracy_km === "" ? "" : "±" + row.accuracy_km + " كم"),
-      detailItem("النظام", row.os || ""),
-      detailItem("إصدار النظام", row.os_version || ""),
-      detailItem("المعمارية", row.architecture || ""),
-      detailItem("الموديل", row.model || ""),
-      detailItem("الشاشة", row.screen ? String(row.screen).replace(/x/g, "×") : ""),
-      detailItem("إصدار المتصفح", row.browser_version || ""),
-      detailItem("لغة المتصفح", row.browser_language || "")
+    board.className = "visit-details";
+    board.append(
+      detailGroup("الشبكة", [
+        detailItem("IP", row.ip || "", "", "latin"),
+        detailItem("مزود الإنترنت", row.isp || "", "", "latin"),
+        detailItem("رقم الشبكة", row.asn ? "AS" + row.asn : "", "", "latin")
+      ]),
+      detailGroup("المكان", [
+        detailItem("الإحداثيات", point ? point.latitude.toFixed(2) + ", " + point.longitude.toFixed(2) : "", point ? mapHref(point) : ""),
+        detailItem("المنطقة الزمنية", row.timezone || "", "", "latin"),
+        detailItem("دقة المكان", row.accuracy_km == null || row.accuracy_km === "" ? "" : row.accuracy_km, "", "accuracy")
+      ]),
+      detailGroup("الجهاز", [
+        detailItem("النظام", row.os || "", "", "latin"),
+        detailItem("إصدار النظام", row.os_version || "", "", "latin"),
+        detailItem("المعمارية", row.architecture || "", "", "latin"),
+        detailItem("الموديل", row.model || "", "", "latin"),
+        detailItem("الشاشة", row.screen ? String(row.screen).replace(/x/g, "×") : "", "", "latin")
+      ]),
+      detailGroup("المتصفح", [
+        detailItem("الإصدار", row.browser_version || "", "", "latin"),
+        detailItem("اللغة", row.browser_language || "", "", "latin")
+      ])
     );
-    holder.append(list);
+    holder.append(board);
     line.append(holder);
     return line;
   }
@@ -227,6 +264,11 @@
       return name + " " + major;
     }
     return name;
+  }
+
+  function deviceLabel(row) {
+    var kind = row.device === "Mobile" ? "موبايل" : "كمبيوتر";
+    return row.model ? kind + " · " + row.model : kind;
   }
 
   function render(rows, total) {
@@ -257,17 +299,19 @@
         }
       }
 
+      var place = placeLabel(row);
+      var source = sourceLabel(row.referrer);
       var line = document.createElement("tr");
       line.className = "visit-main";
       line.append(
-        cell(Number.isNaN(created.valueOf()) ? "" : timeFormat.format(created)),
-        cell(placeLabel(row), "place"),
-        cell(sourceLabel(row.referrer), "source"),
-        cell(pageLabel(row.page)),
-        cell(row.device === "Mobile" ? "موبايل" : "كمبيوتر"),
-        cell(browserLabel(row), "ltr"),
-        cell(String(row.language || "").toUpperCase(), "ltr"),
-        cell(row.visitor_key || "", "ltr")
+        cell(Number.isNaN(created.valueOf()) ? "" : timeFormat.format(created).replace(", ", "\n"), "ltr time", "الوقت"),
+        cell(place, isLatinText(place) ? "place ltr" : "place", "المكان"),
+        cell(source, isLatinText(source) ? "source ltr" : "source", "المصدر"),
+        cell(pageLabel(row.page), "", "الصفحة"),
+        cell(deviceLabel(row), row.model ? "ltr" : "", "الجهاز"),
+        cell(browserLabel(row), "ltr", "المتصفح"),
+        cell(String(row.language || "").toUpperCase(), "ltr", "اللغة"),
+        cell(row.visitor_key || "", "ltr visitor", "الزائر")
       );
       visitRows.append(line, detailsRow(row));
     });

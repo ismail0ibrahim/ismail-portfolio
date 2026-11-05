@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" referrerpolicy="no-referrer">
   <link rel="stylesheet" href="../styles.css">
-  <link rel="stylesheet" href="admin.css?v=5">
+  <link rel="stylesheet" href="admin.css?v=8">
 </head>
 <body>
   <div class="space-bg" aria-hidden="true">
@@ -92,9 +92,19 @@
       </div>
       <p class="admin-note" id="legacyNote" hidden>الزيارات القديمة اتسجلت قبل إضافة البيانات دي، فحقولها فاضية. أي زيارة جديدة هتملا عنوان الـ IP والشبكة والإحداثيات والجهاز.</p>
       <p id="tableStatus">جاري تحميل الزيارات...</p>
-      <div class="admin-table-wrap">
+      <div class="admin-table-wrap" tabindex="0" role="region" aria-labelledby="visitsCaption">
         <table class="admin-table">
-          <caption class="admin-note">آخر 200 زيارة بتوقيت القاهرة</caption>
+          <caption class="admin-note" id="visitsCaption">آخر 200 زيارة بتوقيت القاهرة</caption>
+          <colgroup>
+            <col class="col-time">
+            <col class="col-place">
+            <col class="col-source">
+            <col class="col-page">
+            <col class="col-device">
+            <col class="col-browser">
+            <col class="col-lang">
+            <col class="col-visitor">
+          </colgroup>
           <thead>
             <tr>
               <th scope="col">الوقت</th>
@@ -114,6 +124,6 @@
   </main>
 
   <script src="../analytics-config.js?v=3"></script>
-  <script src="admin.js?v=5"></script>
+  <script src="admin.js?v=7"></script>
 </body>
 </html>
